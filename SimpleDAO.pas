@@ -29,14 +29,14 @@ Type
 {$ENDIF}
         FList: TObjectList<T>;
         function FillParameter(aInstance: T): iSimpleDAO<T>; overload;
-        function FillParameter(aInstance: T; aId: Variant)
-          : iSimpleDAO<T>; overload;
+        function FillParameter(aInstance: T; aId: Variant): iSimpleDAO<T>; overload;
         procedure OnDataChange(Sender: TObject; Field: TField);
     public
         constructor Create(aQuery: iSimpleQuery);
         destructor Destroy; override;
         class function New(aQuery: iSimpleQuery): iSimpleDAO<T>; overload;
         function DataSource(aDataSource: TDataSource): iSimpleDAO<T>;
+        function Replace(aValue : T) : iSimpleDAO<T>; overload;
         function Insert(aValue: T): iSimpleDAO<T>; overload;
         function Update(aValue: T): iSimpleDAO<T>; overload;
         function Delete(aValue: T): iSimpleDAO<T>; overload;
@@ -45,6 +45,7 @@ Type
         function LastID: iSimpleDAO<T>;
         function LastRecord: iSimpleDAO<T>;
 {$IFNDEF CONSOLE}
+        function Replace : iSimpleDAO<T>; overload;
         function Insert: iSimpleDAO<T>; overload;
         function Update: iSimpleDAO<T>; overload;
         function Delete: iSimpleDAO<T>; overload;
@@ -263,6 +264,35 @@ begin
               FList[FDataSource.DataSet.RecNo - 1]);
 {$ENDIF}
     end;
+end;
+
+function TSimpleDAO<T>.Replace: iSimpleDAO<T>;
+var aSQL: String;
+    Entity: T;
+begin
+  Result := Self;
+  Entity := T.Create;
+  try
+    TSimpleSQL<T>.New(Entity).Replace(aSQL);
+    FQuery.SQL.Clear;
+    FQuery.SQL.Add(aSQL);
+    TSimpleRTTI<T>.New(nil).BindFormToClass(FForm, Entity);
+    Self.FillParameter(Entity);
+    FQuery.ExecSQL;
+  finally
+    FreeAndNil(Entity);
+  end;
+end;
+
+function TSimpleDAO<T>.Replace(aValue: T): iSimpleDAO<T>;
+var aSQL: String;
+begin
+  Result := Self;
+  TSimpleSQL<T>.New(aValue).Replace(aSQL);
+  FQuery.SQL.Clear;
+  FQuery.SQL.Add(aSQL);
+  Self.FillParameter(aValue);
+  FQuery.ExecSQL;
 end;
 
 function TSimpleDAO<T>.SQL: iSimpleDAOSQLAttribute<T>;

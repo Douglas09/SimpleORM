@@ -21,10 +21,12 @@ type
   iSimpleDAO<T : class> = interface
     ['{19261B52-6122-4C41-9DDE-D3A1247CC461}']
     {$IFNDEF CONSOLE}
-    function Insert: iSimpleDAO<T>; overload;
+    function Replace : iSimpleDAO<T>; overload;
+    function Insert : iSimpleDAO<T>; overload;
     function Update : iSimpleDAO<T>; overload;
     function Delete : iSimpleDAO<T>; overload;
     {$ENDIF}
+    function Replace(aValue : T) : iSimpleDAO<T>; overload;
     function Insert(aValue : T) : iSimpleDAO<T>; overload;
     function Update(aValue : T) : iSimpleDAO<T>; overload;
     function Delete(aValue : T) : iSimpleDAO<T>; overload;
@@ -81,6 +83,7 @@ type
 
   iSimpleSQL<T> = interface
     ['{1590A7C6-6E32-4579-9E60-38C966C1EB49}']
+    function Replace (var aSQL : String) : iSimpleSQL<T>;
     function Insert (var aSQL : String) : iSimpleSQL<T>;
     function Update (var aSQL : String) : iSimpleSQL<T>;
     function Delete (var aSQL : String) : iSimpleSQL<T>;

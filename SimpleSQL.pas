@@ -15,6 +15,7 @@ Type
       constructor Create(aInstance : T);
       destructor Destroy; override;
       class function New(aInstance : T) : iSimpleSQL<T>;
+      function Replace (var aSQL : String) : iSimpleSQL<T>;
       function Insert (var aSQL : String) : iSimpleSQL<T>;
       function Update (var aSQL : String) : iSimpleSQL<T>;
       function Delete (var aSQL : String) : iSimpleSQL<T>;
@@ -126,6 +127,19 @@ function TSimpleSQL<T>.OrderBy(aSQL: String): iSimpleSQL<T>;
 begin
   Result := Self;
   FOrderBy := aSQL;
+end;
+
+function TSimpleSQL<T>.Replace(var aSQL: String): iSimpleSQL<T>;
+var aClassName, aFields, aParam : String;
+begin
+  Result := Self;
+  TSimpleRTTI<T>.New(FInstance)
+    .TableName(aClassName)
+    .FieldsInsert(aFields)
+    .Param(aParam);
+  aSQL := aSQL + 'REPLACE INTO ' + aClassName;
+  aSQL := aSQL + ' (' + aFields + ') ';
+  aSQL := aSQL + ' VALUES (' + aParam + ');';
 end;
 
 function TSimpleSQL<T>.Select (var aSQL : String) : iSimpleSQL<T>;
